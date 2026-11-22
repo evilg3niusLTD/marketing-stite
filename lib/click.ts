@@ -170,7 +170,6 @@ type VisitFields = { country?: string; ip?: string; device?: string; system?: st
 function visitLines(visit: VisitFields) {
   const lines: string[] = [];
   if (visit.country) lines.push(`Country: ${visit.country}`);
-  if (visit.ip) lines.push(`IP: ${visit.ip}`);
   if (visit.device) lines.push(`Device: ${visit.device}`);
   if (visit.system) lines.push(`System: ${visit.system}`);
   if (visit.browser) lines.push(`Browser: ${visit.browser}`);

@@ -865,7 +865,6 @@ button.btn:disabled { opacity: 0.65; cursor: default; }
   gap: 10px;
 }
 
-.chat-toggle,
 .chat-close,
 .chat-form button {
   border: 0;
@@ -877,7 +876,34 @@ button.btn:disabled { opacity: 0.65; cursor: default; }
   cursor: pointer;
 }
 
-.chat-toggle { padding: 12px 18px; }
+.chat-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 68px;
+  padding: 10px 22px 10px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--green);
+  color: white;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  cursor: pointer;
+  box-shadow: 0 14px 34px rgba(15, 159, 110, 0.38);
+}
+
+.chat-toggle-icon {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.chat-toggle-icon svg { width: 26px; height: 26px; display: block; }
+
 .chat-toggle:hover,
 .chat-form button:hover,
 .chat-close:hover { background: var(--green-deep); }

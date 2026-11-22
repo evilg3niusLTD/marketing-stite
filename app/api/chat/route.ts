@@ -73,6 +73,7 @@ export async function POST(request: Request) {
   }
 
   const lead = parseDeskRequest(turn.submit);
+  if (!lead.ok && turn.reply) return Response.json({ ok: true, reply: turn.reply });
   if (lead.ok) {
     const ad = adDetails(parsed.ad);
     await saveDeskRequest({

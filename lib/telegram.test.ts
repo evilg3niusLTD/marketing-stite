@@ -64,7 +64,8 @@ test("a click alert names the keyword and the rest of the ad", () => {
   assert.match(text, /Device: Mobile/);
   const withVisit = clickAlert({ ...parsed.value, country: "Cyprus", ip: "203.0.113.8", system: "iOS", browser: "Safari" });
   assert.match(withVisit, /Country: Cyprus/);
-  assert.match(withVisit, /IP: 203.0.113.8/);
+  assert.doesNotMatch(withVisit, /203\.0\.113\.8/);
+  assert.doesNotMatch(withVisit, /IP:/);
   assert.match(withVisit, /Browser: Safari/);
   assert.match(text, /Google click: yes/);
 });

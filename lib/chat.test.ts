@@ -43,6 +43,7 @@ test("the daily cap stops a third question from one address", () => {
 test("the model request carries the public facts and the submit tool", () => {
   const body = bedrockRequest([{ role: "user", content: "What is a deal?" }], "/platform", "amazon.nova-lite-v1:0");
   assert.equal(body.modelId, "amazon.nova-lite-v1:0");
+  assert.match(body.system[0].text, /Answer the visitor's question first/);
   assert.match(body.system[0].text, /Call Back/);
   assert.match(body.system[0].text, /\/platform/);
   assert.equal(body.messages[0].role, "user");

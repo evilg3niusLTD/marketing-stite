@@ -72,7 +72,7 @@ export function ChatWidget() {
           </header>
           <div className="chat-log">
             {lines.length === 0 ? (
-              <p className="chat-hello">Ask how the desk works, or leave your email, Telegram, role, countries, and volume.</p>
+              <p className="chat-hello">Ask how the desk works.</p>
             ) : null}
             {lines.map((line, index) => (
               <p key={`${line.role}-${index}`} className={line.role === "user" ? "chat-user" : "chat-assistant"}>
@@ -109,9 +109,30 @@ export function ChatWidget() {
           </p>
         </section>
       ) : null}
-      <button type="button" className="chat-toggle" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
-        {open ? "Hide chat" : "Ask"}
+      <button type="button" className="chat-toggle" aria-expanded={open} aria-label={open ? "Close chat" : "Ask"} onClick={() => setOpen((value) => !value)}>
+        <span className="chat-toggle-icon">{open ? <CloseMark /> : <ChatMark />}</span>
+        <span>{open ? "Close" : "Ask"}</span>
       </button>
     </div>
+  );
+}
+
+function ChatMark() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M7.2 3h9.6A2.4 2.4 0 0 1 19.2 5.4v8.2a2.4 2.4 0 0 1-2.4 2.4h-5.1l-4.3 3.7a.7.7 0 0 1-1.1-.6v-3.1H7.2a2.4 2.4 0 0 1-2.4-2.4V5.4A2.4 2.4 0 0 1 7.2 3Zm1.6 7.3a1.15 1.15 0 1 0 0-2.3 1.15 1.15 0 0 0 0 2.3Zm3.2 0a1.15 1.15 0 1 0 0-2.3 1.15 1.15 0 0 0 0 2.3Zm3.2 0a1.15 1.15 0 1 0 0-2.3 1.15 1.15 0 0 0 0 2.3Z"
+      />
+    </svg>
+  );
+}
+
+function CloseMark() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" d="M6 6l12 12M18 6 6 18" />
+    </svg>
   );
 }

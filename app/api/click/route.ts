@@ -29,7 +29,6 @@ export async function POST(request: Request) {
     createdAt: new Date().toISOString(),
     ...parsed.value,
     country: visit.country,
-    ip: visit.ip,
     device: parsed.value.device || visit.device,
     system: visit.system,
     browser: visit.browser,

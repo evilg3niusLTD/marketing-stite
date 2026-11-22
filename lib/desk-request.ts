@@ -20,7 +20,6 @@ export async function saveDeskRequest(input: {
     ...input.request,
     source: input.source,
     country: input.visit.country,
-    ip: input.visit.ip,
     device: ad?.device || input.visit.device,
     system: input.visit.system,
     browser: input.visit.browser,
@@ -29,6 +28,6 @@ export async function saveDeskRequest(input: {
   const file = dataFile("requests.jsonl", process.env.REQUESTS_FILE);
   await mkdir(path.dirname(file), { recursive: true });
   await appendFile(file, `${JSON.stringify(record)}\n`, "utf8");
-  await sendTelegram(leadAlert({ ...input.request, ...input.visit, device: record.device, source: input.source, ad }));
+  await sendTelegram(leadAlert({ ...input.request, country: input.visit.country, device: record.device, system: input.visit.system, browser: input.visit.browser, source: input.source, ad }));
   return record;
 }
