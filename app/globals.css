@@ -960,6 +960,27 @@ button.btn:disabled { opacity: 0.65; cursor: default; }
 .chat-assistant { background: white; border: 1px solid var(--line); }
 .chat-user { align-self: flex-end; background: var(--night); color: var(--night-text); }
 
+.chat-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 14px 12px;
+  background: white;
+}
+
+.chat-choices button {
+  border: 1px solid var(--line-strong);
+  background: var(--bg-soft);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+}
+
+.chat-choices button:hover { border-color: var(--green); color: var(--green-deep); }
+
 .chat-form {
   display: flex;
   gap: 8px;

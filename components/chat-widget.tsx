@@ -2,14 +2,17 @@
 
 import { FormEvent, useEffect, useId, useRef, useState } from "react";
 import { reportLead } from "@/components/report-lead";
+import { ROLES, VOLUMES } from "@/lib/chat";
 
 type Line = { role: "user" | "assistant"; content: string };
 
 const OFFLINE = "The assistant is offline right now. Use the request form, or email sales@trafficlight.gg.";
+const STARTERS = ["How does a deal work?", "What does an affiliate get?", "How is a deposit reviewed?", "I want a desk"];
 
 export function ChatWidget() {
   const titleId = useId();
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const logRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [draft, setDraft] = useState("");
@@ -25,9 +28,13 @@ export function ChatWidget() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  async function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const content = draft.replace(/\s+/g, " ").trim();
+  useEffect(() => {
+    const log = logRef.current;
+    if (log) log.scrollTop = log.scrollHeight;
+  }, [lines, pending, open]);
+
+  async function send(text: string) {
+    const content = text.replace(/\s+/g, " ").trim();
     if (!content || pending) return;
     const history = [...lines, { role: "user" as const, content }].slice(-12);
     setLines(history);
@@ -57,6 +64,15 @@ export function ChatWidget() {
     }
   }
 
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const content = draft;
+    setDraft("");
+    void send(content);
+  }
+
+  const choices = pending ? [] : choicesFor(lines);
+
   return (
     <div className="chat-dock">
       {open ? (
@@ -70,7 +86,7 @@ export function ChatWidget() {
               Close
             </button>
           </header>
-          <div className="chat-log">
+          <div className="chat-log" ref={logRef}>
             {lines.length === 0 ? (
               <p className="chat-hello">Ask how the desk works.</p>
             ) : null}
@@ -81,6 +97,15 @@ export function ChatWidget() {
             ))}
             {pending ? <p className="chat-assistant">One moment.</p> : null}
           </div>
+          {choices.length > 0 ? (
+            <div className="chat-choices">
+              {choices.map((choice) => (
+                <button key={choice} type="button" onClick={() => void send(choice)}>
+                  {choice}
+                </button>
+              ))}
+            </div>
+          ) : null}
           <form className="chat-form" onSubmit={onSubmit}>
             <label className="sr" htmlFor={`${titleId}-input`}>
               Message
@@ -115,6 +140,16 @@ export function ChatWidget() {
       </button>
     </div>
   );
+}
+
+function choicesFor(lines: Line[]) {
+  if (lines.length === 0) return STARTERS;
+  const last = [...lines].reverse().find((line) => line.role === "assistant");
+  if (!last) return [];
+  const text = last.content.toLowerCase();
+  if (/\brole\b/.test(text)) return [...ROLES];
+  if (text.includes("volume") || text.includes("leads a month")) return [...VOLUMES];
+  return [];
 }
 
 function ChatMark() {

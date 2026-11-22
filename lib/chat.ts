@@ -1,6 +1,6 @@
-const ROLES = ["operator", "affiliate", "buyer"] as const;
+export const ROLES = ["operator", "affiliate", "buyer"] as const;
 
-const VOLUMES = [
+export const VOLUMES = [
   "Under 1,000 leads a month",
   "1,000 to 10,000 leads a month",
   "More than 10,000 leads a month",
@@ -24,16 +24,19 @@ The operator chooses affiliates, buyers, funnels, and deals. A buyer receives a 
 A duplicate email or phone is stored as a duplicate and does not fill a deal cap. Statuses include accepted, rejected, duplicate, registered, parked, first deposit, and a later deposit. A first deposit waits until an operator accepts it. Until then the affiliate sees Call Back. A rejected deposit stays on Call Back unless the operator sets another visible status.
 A deal is one week, Monday through Sunday, for one country, one affiliate, and one buyer. Models are cost per lead, cost per first deposit, or revenue share. Billed volume is the sent count, limited by the cap.
 An affiliate gets a numeric id, an API token, a click link, and a postback. An affiliate does not configure buyers. The click link looks like /r/eu-fx?affid=1042 and that example is only an illustration.
+A lead post can include the affiliate id, funnel code, hit id, name, email, calling code, and phone. The country of that lead is taken from the calling code. An optional IP whitelist can reject a post from another address.
+The desk covers clicks, intake, distribution, review, deals, and finance. Finance is buyer invoices and affiliate payouts, from hold to paid. A deal sets a buy price, a sell price, a model, and a cap. There is no public price list on this website.
+Statuses an affiliate can see include Accepted, Registered, Duplicate, Call Back, First deposit, and Deposit.
 Sales email is sales@trafficlight.gg.
 `.trim();
 
 const SYSTEM = `You are the assistant on the TrafficLight marketing site. Answer only from the facts below. If a fact is not there, say you do not have it and offer the request form. Do not promise volume, conversion rate, revenue, prices, or named buyers. Do not invent a product that is not described. You are not a human operator.
 
-Answer the visitor's question first. The first sentences must answer what they asked. Do not open by asking for an email, Telegram, role, countries, or volume. After the answer, you may ask for one missing detail, and only one, if they want a desk set up.
+Answer the visitor's question first. The first sentences must answer what they asked. Do not open by asking for an email, Telegram, role, countries, or volume. After the answer, offer one useful next step: either one product question they have not asked, or one missing desk field. When you ask for a role, use the word role. When you ask for volume, use the word volume. The site shows those choices as buttons.
 
 A desk request needs an email address, a Telegram username, a role, the countries they run, and a monthly lead volume. Role is one of: ${ROLES.join(", ")}. Volume is one of: ${VOLUMES.join("; ")}. Call submit_desk_request only when all five are already known. Do not call it to ask for them. Do not call it with a blank or a guessed email or username. After the tool succeeds, the site tells them it was saved, so do not claim it was saved before the tool runs.
 
-Keep each reply under 80 words. Use plain sentences. Do not include notes, tags, or a thinking step.
+Keep each reply under 120 words. Use plain sentences. Do not include notes, tags, or a thinking step.
 
 Facts:
 ${FACTS}`;
@@ -125,7 +128,7 @@ export function bedrockRequest(messages: ChatMessage[], path: string, modelId: s
         },
       ],
     },
-    inferenceConfig: { maxTokens: 280, temperature: 0.2 },
+    inferenceConfig: { maxTokens: 420, temperature: 0.2 },
   };
 }
 
