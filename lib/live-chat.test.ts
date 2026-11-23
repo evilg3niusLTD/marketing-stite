@@ -6,20 +6,14 @@ import test from "node:test";
 import { addHumanReply, chatAlert, humanReplies, readTelegramReply, recordChatTurn } from "./live-chat.ts";
 
 test("a live chat alert tells the operator to reply", () => {
-  const text = chatAlert({
-    code: "abc12345",
-    page: "/platform",
-    country: "Cyprus",
-    ip: "203.0.113.8",
-    visitor: "How does a deal work?",
-    assistant: "A deal is one week.",
-    first: true,
-  });
+  const text = chatAlert({ code: "abc12345", visitor: "How does a deal work?" });
   assert.match(text, /Live chat abc12345/);
-  assert.match(text, /Page: \/platform/);
-  assert.match(text, /Country: Cyprus/);
-  assert.match(text, /IP: 203.0.113.8/);
+  assert.match(text, /How does a deal work\?/);
   assert.match(text, /Reply to this message to speak in the chat/);
+  assert.doesNotMatch(text, /Page:/);
+  assert.doesNotMatch(text, /Country:/);
+  assert.doesNotMatch(text, /IP:/);
+  assert.doesNotMatch(text, /Assistant:/);
 });
 
 test("a telegram reply is kept only from the operator chat", () => {

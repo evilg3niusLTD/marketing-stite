@@ -46,17 +46,8 @@ function sessionFile(id: string) {
   return path.join(chatDir(), `${id}.json`);
 }
 
-export function chatAlert(input: { code: string; page: string; country?: string; ip?: string; visitor: string; assistant: string; first: boolean }) {
-  const lines = [`Live chat ${input.code}`];
-  if (input.first) {
-    lines.push(`Page: ${input.page}`);
-    if (input.country) lines.push(`Country: ${input.country}`);
-    if (input.ip) lines.push(`IP: ${input.ip}`);
-  }
-  lines.push(`Visitor: ${clip(input.visitor, 500)}`);
-  if (input.assistant) lines.push(`Assistant: ${clip(input.assistant, 500)}`);
-  lines.push("Reply to this message to speak in the chat.");
-  return lines.join("\n");
+export function chatAlert(input: { code: string; visitor: string }) {
+  return [`Live chat ${input.code}`, `Visitor: ${clip(input.visitor, 500)}`, "Reply to this message to speak in the chat."].join("\n");
 }
 
 export function readTelegramReply(update: unknown, expectedChat: string): { replyTo: number; messageId: number; text: string } | null {
@@ -76,12 +67,11 @@ export function readTelegramReply(update: unknown, expectedChat: string): { repl
   return { replyTo, messageId, text };
 }
 
-export async function recordChatTurn(input: { session: string; page: string; country?: string; ip?: string; visitor: string; assistant: string }, send: (text: string) => Promise<Sent> = defaultSend) {
+export async function recordChatTurn(input: { session: string; page: string; visitor: string; assistant?: string }, send: (text: string) => Promise<Sent> = defaultSend) {
   if (!SESSION.test(input.session) || !input.visitor) return;
   await locked(async () => {
     await mkdir(chatDir(), { recursive: true });
     const existing = await readSession(input.session);
-    const first = !existing;
     const session = existing || { id: input.session, createdAt: new Date().toISOString(), page: input.page, lines: [] };
     session.page = input.page || session.page;
     session.lines.push(line("user", input.visitor));
@@ -90,12 +80,7 @@ export async function recordChatTurn(input: { session: string; page: string; cou
     await writeFile(sessionFile(input.session), JSON.stringify(session), "utf8");
     const sent = await send(chatAlert({
       code: input.session.slice(0, 8),
-      page: session.page,
-      country: input.country,
-      ip: input.ip,
       visitor: input.visitor,
-      assistant: input.assistant,
-      first,
     }));
     if (!sent.ok) return;
     const index = await readIndex();
