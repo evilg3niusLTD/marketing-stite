@@ -17,6 +17,14 @@ test("a lead alert names the saved fields", () => {
   assert.match(text, /affiliate/);
 });
 
+test("an email and role are enough for the first alert", () => {
+  const text = leadAlert({ email: "ada@example.com", role: "operator" });
+  assert.match(text, /New desk request/);
+  assert.match(text, /ada@example.com/);
+  assert.match(text, /More details: not sent yet/);
+  assert.doesNotMatch(text, /Telegram:/);
+});
+
 test("a chat lead is marked in the alert", () => {
   const text = leadAlert({
     email: "ada@example.com",

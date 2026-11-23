@@ -717,6 +717,7 @@ textarea:focus {
 }
 
 .form-actions p { color: var(--muted); font-size: 0.92rem; }
+.form-note { grid-column: 1 / -1; color: var(--soft); }
 
 .form-status {
   margin: 0;

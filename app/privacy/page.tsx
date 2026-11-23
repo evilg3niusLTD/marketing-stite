@@ -22,7 +22,7 @@ export default function PrivacyPage() {
 
       <h2>This website</h2>
       <p>
-        The request form saves your email address, Telegram username, role, countries, and rough lead volume on this server so we can reply. It does not open your email app. After the request is saved, we send those same details to a Telegram chat that TrafficLight controls.
+        The request form first saves your email address and role on this server so we can reply. Telegram, countries, and lead volume are saved on the next step when you send them. It does not open your email app. After each step is saved, we send those details to a Telegram chat that TrafficLight controls.
       </p>
       <p>
         The chat on this site sends the message you type to Amazon Bedrock so it can answer from the public pages. A request you complete in the chat is saved and sent to that same Telegram chat, marked as coming from the chat. Chat text that does not become a request is not stored on this server.

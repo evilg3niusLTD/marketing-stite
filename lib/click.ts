@@ -177,10 +177,15 @@ function visitLines(visit: VisitFields) {
   return lines;
 }
 
-export function leadAlert(record: { email: string; telegram: string; role: string; countries: string; volume: string; source?: string; ad?: AdDetails } & VisitFields) {
-  const lines = ["New desk request"];
+export function leadAlert(record: { email: string; telegram?: string; role: string; countries?: string; volume?: string; source?: string; ad?: AdDetails; updated?: boolean } & VisitFields) {
+  const lines = [record.updated ? "Desk request updated" : "New desk request"];
   if (record.source === "chat") lines.push("From: chat");
-  lines.push(`Email: ${record.email}`, `Telegram: ${record.telegram}`, `Role: ${record.role}`, `Countries: ${record.countries}`, `Volume: ${record.volume}`, ...visitLines(record));
+  lines.push(`Email: ${record.email}`, `Role: ${record.role}`);
+  if (record.telegram) lines.push(`Telegram: ${record.telegram}`);
+  if (record.countries) lines.push(`Countries: ${record.countries}`);
+  if (record.volume) lines.push(`Volume: ${record.volume}`);
+  if (!record.telegram && !record.countries && !record.volume) lines.push("More details: not sent yet");
+  lines.push(...visitLines(record));
   if (record.ad && hasAd(record.ad)) lines.push(...adLines(record.ad));
   return lines.join("\n");
 }

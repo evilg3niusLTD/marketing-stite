@@ -14,7 +14,7 @@ export default function RequestPage() {
         <p className="kicker">Request a desk</p>
         <h1>Tell us how your team runs traffic.</h1>
         <p className="lede">
-          TrafficLight sets up the platform. You operate affiliates, buyers, and deals. There is no self-serve trial on this site. We reply by email or Telegram.
+          Start with your email and role. Telegram, countries, and volume can follow. There is no self-serve trial on this site. We reply by email or Telegram.
         </p>
         <dl className="contact-facts">
           <div>
