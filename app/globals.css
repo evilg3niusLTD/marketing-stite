@@ -1023,6 +1023,30 @@ button.btn:disabled { opacity: 0.65; cursor: default; }
   .chat-dock { right: 12px; bottom: 12px; }
 }
 
+.report-page { display: grid; gap: 28px; padding-bottom: 64px; }
+.report-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.report-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: white;
+  padding: 18px;
+}
+.report-card h2 { font-size: 1rem; letter-spacing: -0.03em; }
+.report-card p { font-size: 1.35rem; letter-spacing: -0.04em; }
+.report-card span { color: var(--muted); font-size: 0.9rem; }
+.report-table-wrap { overflow-x: auto; }
+.report-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+.report-table th, .report-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.report-table th { color: var(--muted); font-weight: 600; }
+.report-login { display: grid; gap: 12px; max-width: 360px; }
+.report-login label { display: grid; gap: 6px; font-weight: 600; }
+.report-login input { border: 1px solid var(--line-strong); border-radius: 12px; padding: 12px 14px; }
+.report-login p { color: var(--red); }
+
+@media (max-width: 800px) {
+  .report-grid { grid-template-columns: 1fr 1fr; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .module-card { transition: none; }
