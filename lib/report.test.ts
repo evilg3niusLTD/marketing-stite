@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { clickDetail, filterClicks, mediaOf, passwordMatches, summarizeVisits, visitQuery } from "./report.ts";
+import { clickDetail, filterClicks, loginState, mediaOf, passwordMatches, recordLoginFailure, recordLoginSuccess, summarizeVisits, visitQuery } from "./report.ts";
 
 test("a click is grouped by the media source", () => {
   assert.equal(mediaOf({ gclid: "abc", source: "google" }), "Google");
@@ -68,4 +68,15 @@ test("a password matches only the saved value", () => {
   assert.equal(passwordMatches("correct-horse", "correct-horse"), true);
   assert.equal(passwordMatches("wrong", "correct-horse"), false);
   assert.equal(passwordMatches("", "correct-horse"), false);
+});
+
+test("five wrong passwords lock the address for 15 minutes", () => {
+  const ip = "203.0.113.55";
+  const start = Date.parse("2026-11-23T12:00:00Z");
+  recordLoginSuccess(ip);
+  for (let attempt = 0; attempt < 4; attempt += 1) assert.equal(recordLoginFailure(ip, start), "failed");
+  assert.equal(recordLoginFailure(ip, start), "locked");
+  assert.equal(loginState(ip, start + 14 * 60 * 1000), "locked");
+  assert.equal(loginState(ip, start + 15 * 60 * 1000), "open");
+  recordLoginSuccess(ip);
 });

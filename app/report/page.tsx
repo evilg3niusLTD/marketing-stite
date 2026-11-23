@@ -1,6 +1,7 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
-import { filterClicks, loadVisitReport, nicosiaTime, passwordMatches, reportToken, visitQuery, type ClickDetail } from "@/lib/report";
+import { filterClicks, loadVisitReport, loginState, nicosiaTime, passwordMatches, recordLoginFailure, recordLoginSuccess, reportToken, visitQuery, type ClickDetail } from "@/lib/report";
+import { clientAddress } from "@/lib/visitor";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,7 @@ export default async function ReportPage({ searchParams }: { searchParams: Promi
   const jar = await cookies();
   const open = jar.get("tl_report")?.value === reportToken(password);
   const params = await searchParams;
-  if (!open) return <Login failed={params.e === "1"} />;
+  if (!open) return <Login failed={params.e === "1"} locked={params.e === "2"} />;
   const query = visitQuery(params);
   const report = await loadVisitReport();
   const clicks = filterClicks(report.clicks, query, new Date());
@@ -177,7 +178,7 @@ function ClickTable({ rows }: { rows: ClickDetail[] }) {
   );
 }
 
-function Login({ failed }: { failed: boolean }) {
+function Login({ failed, locked }: { failed: boolean; locked: boolean }) {
   return (
     <section className="page-hero wrap report-page">
       <div>
@@ -187,12 +188,13 @@ function Login({ failed }: { failed: boolean }) {
       <form className="report-login" action={enter}>
         <label>
           Password
-          <input name="password" type="password" autoComplete="current-password" required />
+          <input name="password" type="password" autoComplete="current-password" maxLength={200} required />
         </label>
         <button className="btn" type="submit">
           Open
         </button>
-        {failed ? <p role="alert">That password is not right.</p> : null}
+        {locked ? <p role="alert">Too many tries. Wait 15 minutes.</p> : null}
+        {failed && !locked ? <p role="alert">That password is not right.</p> : null}
       </form>
     </section>
   );
@@ -213,9 +215,17 @@ async function leave() {
 
 async function enter(formData: FormData) {
   "use server";
+  const headerList = await headers();
+  const ip = clientAddress(headerList) || "unknown";
+  const now = Date.now();
+  if (loginState(ip, now) === "locked") redirect("/report?e=2");
   const password = process.env.REPORT_PASSWORD || "";
-  const given = String(formData.get("password") || "");
-  if (!password || !passwordMatches(given, password)) redirect("/report?e=1");
+  const given = String(formData.get("password") || "").slice(0, 200);
+  if (!password || !passwordMatches(given, password)) {
+    const result = recordLoginFailure(ip, now);
+    redirect(result === "locked" ? "/report?e=2" : "/report?e=1");
+  }
+  recordLoginSuccess(ip);
   const jar = await cookies();
   jar.set("tl_report", reportToken(password), {
     httpOnly: true,

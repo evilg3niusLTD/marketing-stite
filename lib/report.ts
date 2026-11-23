@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from "crypto";
+import { createHash, createHmac, timingSafeEqual } from "crypto";
 import { readFile } from "fs/promises";
 
 export const MEDIA = ["Google", "Bing", "Telegram", "Direct"] as const;
@@ -54,11 +54,34 @@ export function reportToken(password: string) {
   return createHmac("sha256", password).update("trafficlight-visits").digest("hex");
 }
 
+const loginAttempts = new Map<string, { failures: number; lockedUntil: number }>();
+
 export function passwordMatches(given: string, password: string) {
-  const left = Buffer.from(given);
-  const right = Buffer.from(password);
-  if (left.length === 0 || left.length !== right.length) return false;
+  const left = createHash("sha256").update(given.slice(0, 200)).digest();
+  const right = createHash("sha256").update(password).digest();
   return timingSafeEqual(left, right);
+}
+
+export function loginState(ip: string, now: number) {
+  const bucket = loginAttempts.get(ip);
+  if (bucket && bucket.lockedUntil > now) return "locked" as const;
+  return "open" as const;
+}
+
+export function recordLoginFailure(ip: string, now: number) {
+  const bucket = loginAttempts.get(ip) || { failures: 0, lockedUntil: 0 };
+  if (bucket.lockedUntil > now) return "locked" as const;
+  bucket.failures += 1;
+  if (bucket.failures >= 5) {
+    bucket.failures = 0;
+    bucket.lockedUntil = now + 15 * 60 * 1000;
+  }
+  loginAttempts.set(ip, bucket);
+  return bucket.lockedUntil > now ? ("locked" as const) : ("failed" as const);
+}
+
+export function recordLoginSuccess(ip: string) {
+  loginAttempts.delete(ip);
 }
 
 export function mediaOf(record: Record<string, unknown>): MediaName {
