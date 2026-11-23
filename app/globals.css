@@ -1024,6 +1024,9 @@ button.btn:disabled { opacity: 0.65; cursor: default; }
 }
 
 .report-page { display: grid; gap: 28px; padding-bottom: 64px; }
+.report-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.report-logout { border: 1px solid var(--line-strong); background: white; border-radius: 999px; padding: 10px 16px; font-weight: 700; cursor: pointer; }
+.report-logout:hover { border-color: var(--ink); }
 .report-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 .report-card {
   border: 1px solid var(--line);

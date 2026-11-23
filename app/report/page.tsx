@@ -24,10 +24,17 @@ export default async function ReportPage({ searchParams }: { searchParams: Promi
   const countries = [...new Set(report.clicks.map((click) => click.country).filter(Boolean))].sort();
   return (
     <section className="page-hero wrap report-page">
-      <div>
-        <p className="kicker">Visits</p>
-        <h1>Clicks</h1>
-        <p className="lede">Each row is one saved visit. Times follow Asia/Nicosia. This page is not part of the public site.</p>
+      <div className="report-head">
+        <div>
+          <p className="kicker">Visits</p>
+          <h1>Clicks</h1>
+          <p className="lede">Each row is one saved visit. Times follow Asia/Nicosia. This page is not part of the public site.</p>
+        </div>
+        <form action={leave}>
+          <button className="report-logout" type="submit">
+            Log out
+          </button>
+        </form>
       </div>
       <form className="report-filters" action="/report">
         <label>
@@ -189,6 +196,19 @@ function Login({ failed }: { failed: boolean }) {
       </form>
     </section>
   );
+}
+
+async function leave() {
+  "use server";
+  const jar = await cookies();
+  jar.set("tl_report", "", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/report",
+    maxAge: 0,
+  });
+  redirect("/report");
 }
 
 async function enter(formData: FormData) {
