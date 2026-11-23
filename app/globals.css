@@ -1042,6 +1042,12 @@ button.btn:disabled { opacity: 0.65; cursor: default; }
 .report-login label { display: grid; gap: 6px; font-weight: 600; }
 .report-login input { border: 1px solid var(--line-strong); border-radius: 12px; padding: 12px 14px; }
 .report-login p { color: var(--red); }
+.report-filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.report-filters label { display: grid; gap: 6px; font-weight: 600; font-size: 0.92rem; }
+.report-filters select, .report-filters input { border: 1px solid var(--line-strong); border-radius: 12px; padding: 10px 12px; background: white; min-width: 160px; }
+.report-count { color: var(--muted); }
+.report-table td:last-child, .report-table th:last-child { white-space: normal; min-width: 240px; }
+.report-table thead th { position: sticky; top: 0; background: white; }
 
 @media (max-width: 800px) {
   .report-grid { grid-template-columns: 1fr 1fr; }

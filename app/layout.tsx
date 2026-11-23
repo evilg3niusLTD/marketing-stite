@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { headers } from "next/headers";
 import { IBM_Plex_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { ChatGate } from "@/components/chat-gate";
 import { ClickBeacon } from "@/components/click-beacon";
@@ -39,24 +40,28 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const path = (await headers()).get("x-tl-path") || "";
+  const privatePage = path === "/report";
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable}`}>
       <head>
-        <script async src={`https://www.googletagmanager.com/gtag/js?id=${ADS_ID}`} />
-        <script id="google-ads" dangerouslySetInnerHTML={{ __html: ADS_SNIPPET }} />
-        <script id="google-tag-manager" dangerouslySetInnerHTML={{ __html: GTM_SNIPPET }} />
+        {privatePage ? null : <script async src={`https://www.googletagmanager.com/gtag/js?id=${ADS_ID}`} />}
+        {privatePage ? null : <script id="google-ads" dangerouslySetInnerHTML={{ __html: ADS_SNIPPET }} />}
+        {privatePage ? null : <script id="google-tag-manager" dangerouslySetInnerHTML={{ __html: GTM_SNIPPET }} />}
       </head>
       <body className={sans.className}>
-        <GoogleTagNoscript />
-        <ClickBeacon />
-        <a className="skip" href="#content">
-          Skip to content
-        </a>
-        <Header />
+        {privatePage ? null : <GoogleTagNoscript />}
+        {privatePage ? null : <ClickBeacon />}
+        {privatePage ? null : (
+          <a className="skip" href="#content">
+            Skip to content
+          </a>
+        )}
+        {privatePage ? null : <Header />}
         <main id="content">{children}</main>
-        <Footer />
-        <ChatGate />
+        {privatePage ? null : <Footer />}
+        {privatePage ? null : <ChatGate />}
       </body>
     </html>
   );

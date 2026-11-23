@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { mediaOf, passwordMatches, summarizeVisits } from "./report.ts";
+import { clickDetail, filterClicks, mediaOf, passwordMatches, summarizeVisits, visitQuery } from "./report.ts";
 
 test("a click is grouped by the media source", () => {
   assert.equal(mediaOf({ gclid: "abc", source: "google" }), "Google");
@@ -34,6 +34,34 @@ test("the report counts the last seven days and keeps recent leads", () => {
   assert.equal(direct?.clicks, 1);
   assert.equal(report.leads[0].email, "ada@example.com");
   assert.equal(report.leads[0].keyword, "desk");
+});
+
+test("a click keeps the visit fields and the filters narrow them", () => {
+  const now = new Date("2026-11-23T16:00:00Z");
+  const google = clickDetail({
+    createdAt: "2026-11-23T10:00:00Z",
+    path: "/request",
+    country: "Cyprus",
+    ip: "203.0.113.8",
+    device: "Computer",
+    system: "Windows",
+    browser: "Chrome",
+    gclid: "abc",
+    source: "google",
+    campaign: "brand",
+    keyword: "desk",
+    match: "Exact",
+    network: "Google Search",
+    extra: { msclkid: "should-not-win" },
+  });
+  const direct = clickDetail({ createdAt: "2026-11-23T11:00:00Z", path: "/", country: "Germany" });
+  assert.equal(google.media, "Google");
+  assert.equal(google.keyword, "desk");
+  assert.equal(google.ip, "203.0.113.8");
+  assert.match(google.details, /gclid: abc/);
+  assert.match(google.details, /msclkid: should-not-win/);
+  const query = visitQuery({ media: "Google", country: "Cyprus", range: "today", q: "desk" });
+  assert.deepEqual(filterClicks([google, direct], query, now).map((row) => row.page), ["/request"]);
 });
 
 test("a password matches only the saved value", () => {
