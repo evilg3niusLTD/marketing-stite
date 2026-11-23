@@ -30,7 +30,7 @@ Statuses an affiliate can see include Accepted, Registered, Duplicate, Call Back
 Sales email is sales@trafficlight.gg.
 `.trim();
 
-const SYSTEM = `You are the assistant on the TrafficLight marketing site. Answer only from the facts below. If a fact is not there, say you do not have it and offer the request form. Do not promise volume, conversion rate, revenue, prices, or named buyers. Do not invent a product that is not described. You are not a human operator.
+const SYSTEM = `You are the assistant on the TrafficLight marketing site. Answer only from the facts below. If a fact is not there, say you do not have it and offer the request form. Do not promise volume, conversion rate, revenue, prices, or named buyers. Do not invent a product that is not described. You are not a human operator. A person from TrafficLight may also reply in this chat. Do not speak as that person, and do not claim their words are yours.
 
 Answer the visitor's question first. The first sentences must answer what they asked. Do not open by asking for an email, Telegram, role, countries, or volume. After the answer, offer one useful next step: either one product question they have not asked, or one missing desk field. When you ask for a role, use the word role. When you ask for volume, use the word volume. The site shows those choices as buttons.
 
@@ -41,7 +41,7 @@ Keep each reply under 120 words. Use plain sentences. Do not include notes, tags
 Facts:
 ${FACTS}`;
 
-export type ChatMessage = { role: "user" | "assistant"; content: string };
+export type ChatMessage = { role: "user" | "assistant" | "human"; content: string };
 
 export type ChatLimits = {
   perIp: number;
@@ -68,14 +68,14 @@ export function runtimeEnv(name: string) {
   return env?.[name] || "";
 }
 
-export function parseChatRequest(input: unknown): { ok: true; messages: ChatMessage[]; path: string; ad: Record<string, unknown> } | { ok: false; error: string } {
+export function parseChatRequest(input: unknown): { ok: true; messages: ChatMessage[]; path: string; ad: Record<string, unknown>; session: string } | { ok: false; error: string } {
   const body = input && typeof input === "object" ? (input as Record<string, unknown>) : {};
   const raw = Array.isArray(body.messages) ? body.messages : [];
   if (raw.length < 1 || raw.length > 12) return { ok: false, error: "Send one question at a time." };
   const messages: ChatMessage[] = [];
   for (const item of raw) {
     const row = item && typeof item === "object" ? (item as Record<string, unknown>) : {};
-    const role = row.role === "assistant" ? "assistant" : row.role === "user" ? "user" : "";
+    const role = row.role === "assistant" || row.role === "human" || row.role === "user" ? row.role : "";
     const content = String(row.content || "").replace(/\s+/g, " ").trim();
     if (!role || content.length < 1 || content.length > 800) return { ok: false, error: "Keep the message short." };
     messages.push({ role, content });
@@ -84,7 +84,9 @@ export function parseChatRequest(input: unknown): { ok: true; messages: ChatMess
   const path = String(body.path || "/").trim();
   const safePath = path.startsWith("/") && !path.includes("..") && /^\/[\w\-./]*$/.test(path) ? path.slice(0, 80) : "/";
   const ad = body.ad && typeof body.ad === "object" ? (body.ad as Record<string, unknown>) : {};
-  return { ok: true, messages, path: safePath, ad };
+  const session = String(body.session || "");
+  const safeSession = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(session) ? session : "";
+  return { ok: true, messages, path: safePath, ad, session: safeSession };
 }
 
 export function allowChat(ip: string, now: Date, limits: ChatLimits) {
@@ -112,8 +114,8 @@ export function bedrockRequest(messages: ChatMessage[], path: string, modelId: s
     system: [{ text: `${SYSTEM}\n\nThe visitor is on ${path}.` }],
     messages: [
       ...messages.map((message) => ({
-        role: message.role,
-        content: [{ text: message.content }],
+        role: message.role === "human" ? "assistant" : message.role,
+        content: [{ text: message.role === "human" ? `A person from TrafficLight told the visitor: ${message.content}` : message.content }],
       })),
       ...extra,
     ],

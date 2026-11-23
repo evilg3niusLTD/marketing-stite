@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useId, useRef, useState } from "react";
 import { reportLead } from "@/components/report-lead";
 import { ROLES, VOLUMES } from "@/lib/chat";
 
-type Line = { role: "user" | "assistant"; content: string };
+type Line = { role: "user" | "assistant" | "human"; content: string; id?: string };
 
 const OFFLINE = "The assistant is offline right now. Use the request form, or email sales@trafficlight.gg.";
 const STARTERS = ["How does a deal work?", "What does an affiliate get?", "How is a deposit reviewed?", "I want a desk"];
@@ -13,10 +13,63 @@ export function ChatWidget() {
   const titleId = useId();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const logRef = useRef<HTMLDivElement>(null);
+  const linesRef = useRef<Line[]>([]);
+  const openRef = useRef(false);
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [draft, setDraft] = useState("");
   const [lines, setLines] = useState<Line[]>([]);
+  const [session, setSession] = useState("");
+  const [live, setLive] = useState(false);
+  const [unread, setUnread] = useState(false);
+
+  useEffect(() => {
+    openRef.current = open;
+    if (open) setUnread(false);
+  }, [open]);
+
+  useEffect(() => {
+    let id = "";
+    try {
+      const saved = sessionStorage.getItem("tl-chat-session") || "";
+      id = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(saved) ? saved : crypto.randomUUID();
+      sessionStorage.setItem("tl-chat-session", id);
+      if (sessionStorage.getItem("tl-chat-live") === "1") setLive(true);
+    } catch {
+      id = crypto.randomUUID();
+    }
+    setSession(id);
+  }, []);
+
+  useEffect(() => {
+    if (!live || !session) return;
+    let stop = false;
+    async function pull() {
+      try {
+        const response = await fetch(`/api/chat/live?session=${session}`);
+        const data = (await response.json().catch(() => null)) as { messages?: { id?: string; content?: string }[] } | null;
+        const incoming = data && Array.isArray(data.messages) ? data.messages : [];
+        const have = new Set(linesRef.current.map((line) => line.id).filter(Boolean));
+        const fresh = incoming.filter((item) => item.id && item.content && !have.has(item.id));
+        if (!fresh.length || stop) return;
+        const next = [
+          ...linesRef.current,
+          ...fresh.map((item) => ({ role: "human" as const, content: String(item.content), id: String(item.id) })),
+        ].slice(-24);
+        linesRef.current = next;
+        setLines(next);
+        if (!openRef.current) setUnread(true);
+      } catch {
+        // The next poll tries again.
+      }
+    }
+    void pull();
+    const timer = window.setInterval(() => void pull(), 4000);
+    return () => {
+      stop = true;
+      window.clearInterval(timer);
+    };
+  }, [live, session]);
 
   useEffect(() => {
     if (!open) return;
@@ -36,10 +89,17 @@ export function ChatWidget() {
   async function send(text: string) {
     const content = text.replace(/\s+/g, " ").trim();
     if (!content || pending) return;
-    const history = [...lines, { role: "user" as const, content }].slice(-12);
+    const history = [...linesRef.current, { role: "user" as const, content }].slice(-12);
+    linesRef.current = history;
     setLines(history);
     setDraft("");
     setPending(true);
+    setLive(true);
+    try {
+      sessionStorage.setItem("tl-chat-live", "1");
+    } catch {
+      // The reply still works for this page view.
+    }
     try {
       let ad: unknown;
       try {
@@ -51,14 +111,23 @@ export function ChatWidget() {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ messages: history, path: window.location.pathname, ad }),
+        body: JSON.stringify({
+          messages: history.map((line) => ({ role: line.role, content: line.content })),
+          path: window.location.pathname,
+          ad,
+          session,
+        }),
       });
       const data = (await response.json().catch(() => null)) as { reply?: string; saved?: boolean; email?: string } | null;
       const reply = data && typeof data.reply === "string" && data.reply ? data.reply : OFFLINE;
-      setLines((current) => [...current, { role: "assistant" as const, content: reply }].slice(-12));
+      const next = [...linesRef.current, { role: "assistant" as const, content: reply }].slice(-24);
+      linesRef.current = next;
+      setLines(next);
       if (data?.saved && data.email) reportLead(data.email);
     } catch {
-      setLines((current) => [...current, { role: "assistant", content: OFFLINE }]);
+      const next = [...linesRef.current, { role: "assistant" as const, content: OFFLINE }].slice(-24);
+      linesRef.current = next;
+      setLines(next);
     } finally {
       setPending(false);
     }
@@ -72,6 +141,7 @@ export function ChatWidget() {
   }
 
   const choices = pending ? [] : choicesFor(lines);
+  const person = lines.some((line) => line.role === "human");
 
   return (
     <div className="chat-dock">
@@ -80,7 +150,7 @@ export function ChatWidget() {
           <header className="chat-head">
             <div>
               <p id={titleId}>Ask about the desk</p>
-              <span>Answers come from the public pages.</span>
+              <span>{person ? "A person from TrafficLight is in this chat." : "Answers come from the public pages."}</span>
             </div>
             <button type="button" className="chat-close" onClick={() => setOpen(false)} aria-label="Close chat">
               Close
@@ -91,7 +161,8 @@ export function ChatWidget() {
               <p className="chat-hello">Ask how the desk works.</p>
             ) : null}
             {lines.map((line, index) => (
-              <p key={`${line.role}-${index}`} className={line.role === "user" ? "chat-user" : "chat-assistant"}>
+              <p key={line.id || `${line.role}-${index}`} className={line.role === "user" ? "chat-user" : line.role === "human" ? "chat-human" : "chat-assistant"}>
+                {line.role === "human" ? <small>TrafficLight</small> : null}
                 {line.content}
               </p>
             ))}
@@ -134,9 +205,10 @@ export function ChatWidget() {
           </p>
         </section>
       ) : null}
-      <button type="button" className="chat-toggle" aria-expanded={open} aria-label={open ? "Close chat" : "Ask"} onClick={() => setOpen((value) => !value)}>
+      <button type="button" className="chat-toggle" aria-expanded={open} aria-label={open ? "Close chat" : unread ? "Ask, new reply" : "Ask"} onClick={() => setOpen((value) => !value)}>
         <span className="chat-toggle-icon">{open ? <CloseMark /> : <ChatMark />}</span>
         <span>{open ? "Close" : "Ask"}</span>
+        {unread && !open ? <span className="chat-unread" /> : null}
       </button>
     </div>
   );

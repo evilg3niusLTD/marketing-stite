@@ -950,6 +950,7 @@ button.btn:disabled { opacity: 0.65; cursor: default; }
 
 .chat-hello,
 .chat-assistant,
+.chat-human,
 .chat-user {
   max-width: 92%;
   padding: 10px 12px;
@@ -959,7 +960,16 @@ button.btn:disabled { opacity: 0.65; cursor: default; }
 
 .chat-hello,
 .chat-assistant { background: white; border: 1px solid var(--line); }
+.chat-human { background: #e7f6ef; border: 1px solid var(--green); }
+.chat-human small { display: block; margin-bottom: 4px; color: var(--green-deep); font-weight: 700; }
 .chat-user { align-self: flex-end; background: var(--night); color: var(--night-text); }
+.chat-unread {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
 
 .chat-choices {
   display: flex;

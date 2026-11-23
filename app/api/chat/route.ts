@@ -16,8 +16,9 @@ import {
   type ModelTurn,
 } from "@/lib/chat";
 import { saveDeskRequest } from "@/lib/desk-request";
+import { recordChatTurn } from "@/lib/live-chat";
 import { parseDeskRequest, type RequestErrors } from "@/lib/request";
-import { clientAddress, visitContext } from "@/lib/visitor";
+import { clientAddress, visitContext, type VisitContext } from "@/lib/visitor";
 
 export const runtime = "nodejs";
 
@@ -56,24 +57,35 @@ export async function POST(request: Request) {
   }
   const parsed = parseChatRequest(input);
   if (!parsed.ok) return Response.json({ ok: false, error: parsed.error }, { status: 400 });
+  const visit = await visitContext(request.headers);
+  const relay = (reply: string) => remember(parsed.session, parsed.path, parsed.messages, reply, visit);
 
   if (!runtimeEnv("BEDROCK_REGION")) {
+    await relay(CHAT_OFFLINE);
     return Response.json({ ok: true, reply: CHAT_OFFLINE, offline: true });
   }
-  const visit = await visitContext(request.headers);
   const ip = visit.ip || clientAddress(request.headers) || "unknown";
   if (!allowChat(ip, new Date(), limits)) {
+    await relay(CHAT_LIMIT);
     return Response.json({ ok: true, reply: CHAT_LIMIT, limited: true });
   }
 
   const turn = await ask(parsed.messages, parsed.path);
-  if (!turn) return Response.json({ ok: true, reply: CHAT_OFFLINE, offline: true });
+  if (!turn) {
+    await relay(CHAT_OFFLINE);
+    return Response.json({ ok: true, reply: CHAT_OFFLINE, offline: true });
+  }
   if (turn.submit === undefined) {
-    return Response.json({ ok: true, reply: turn.reply || CHAT_OFFLINE });
+    const reply = turn.reply || CHAT_OFFLINE;
+    await relay(reply);
+    return Response.json({ ok: true, reply });
   }
 
   const lead = parseDeskRequest(turn.submit);
-  if (!lead.ok && turn.reply) return Response.json({ ok: true, reply: turn.reply });
+  if (!lead.ok && turn.reply) {
+    await relay(turn.reply);
+    return Response.json({ ok: true, reply: turn.reply });
+  }
   if (lead.ok) {
     const ad = adDetails(parsed.ad);
     await saveDeskRequest({
@@ -82,6 +94,7 @@ export async function POST(request: Request) {
       ad: hasAd(ad) ? ad : undefined,
       source: "chat",
     });
+    await relay(CHAT_SAVED);
     return Response.json({ ok: true, reply: CHAT_SAVED, saved: true, email: lead.value.email });
   }
 
@@ -98,9 +111,21 @@ export async function POST(request: Request) {
         ad: hasAd(ad) ? ad : undefined,
         source: "chat",
       });
+      await relay(CHAT_SAVED);
       return Response.json({ ok: true, reply: CHAT_SAVED, saved: true, email: again.value.email });
     }
   }
   const reply = follow?.reply || Object.values(lead.errors).join(" ");
+  await relay(reply);
   return Response.json({ ok: true, reply });
+}
+
+async function remember(session: string, page: string, messages: ChatMessage[], reply: string, visit: VisitContext) {
+  const visitor = [...messages].reverse().find((message) => message.role === "user")?.content || "";
+  if (!session || !visitor) return;
+  try {
+    await recordChatTurn({ session, page, visitor, assistant: reply, country: visit.country, ip: visit.ip });
+  } catch {
+    // The visitor still gets the answer when the live relay fails.
+  }
 }

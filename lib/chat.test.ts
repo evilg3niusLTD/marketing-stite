@@ -21,6 +21,22 @@ test("a chat turn keeps a short question and a safe page", () => {
   assert.equal(parsed.messages.length, 2);
 });
 
+test("a human reply stays in the transcript sent to the model", () => {
+  const parsed = parseChatRequest({
+    session: "11111111-1111-4111-8111-111111111111",
+    messages: [
+      { role: "human", content: "I can set the desk up." },
+      { role: "user", content: "Thank you." },
+    ],
+  });
+  assert.equal(parsed.ok, true);
+  if (!parsed.ok) return;
+  assert.equal(parsed.session, "11111111-1111-4111-8111-111111111111");
+  const body = bedrockRequest(parsed.messages, "/", "amazon.nova-lite-v1:0");
+  assert.equal(body.messages[0].role, "assistant");
+  assert.match(body.messages[0].content[0].text, /A person from TrafficLight/);
+});
+
 test("a chat turn rejects a long message and a bad page", () => {
   const long = parseChatRequest({ messages: [{ role: "user", content: "a".repeat(801) }] });
   assert.equal(long.ok, false);
