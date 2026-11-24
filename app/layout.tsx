@@ -4,8 +4,8 @@ import { IBM_Plex_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { ChatGate } from "@/components/chat-gate";
 import { ClickBeacon } from "@/components/click-beacon";
 import { Footer } from "@/components/footer";
-import { ADS_SNIPPET, GTM_SNIPPET, GoogleTagNoscript } from "@/components/google-tag";
-import { ADS_ID } from "@/lib/site";
+import { GTAG_SNIPPET, GoogleTagNoscript } from "@/components/google-tag";
+import { GTM_ID } from "@/lib/site";
 import { Header } from "@/components/header";
 import "./globals.css";
 
@@ -46,9 +46,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable}`}>
       <head>
-        {privatePage ? null : <script async src={`https://www.googletagmanager.com/gtag/js?id=${ADS_ID}`} />}
-        {privatePage ? null : <script id="google-ads" dangerouslySetInnerHTML={{ __html: ADS_SNIPPET }} />}
-        {privatePage ? null : <script id="google-tag-manager" dangerouslySetInnerHTML={{ __html: GTM_SNIPPET }} />}
+        {privatePage ? null : <script async src={`https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`} />}
+        {privatePage ? null : <script id="google-tag" dangerouslySetInnerHTML={{ __html: GTAG_SNIPPET }} />}
       </head>
       <body className={sans.className}>
         {privatePage ? null : <GoogleTagNoscript />}
