@@ -5,7 +5,7 @@ import { ChatGate } from "@/components/chat-gate";
 import { ClickBeacon } from "@/components/click-beacon";
 import { Footer } from "@/components/footer";
 import { GTAG_SNIPPET, GoogleTagNoscript } from "@/components/google-tag";
-import { GTM_ID } from "@/lib/site";
+import { ADS_ID, GTM_ID } from "@/lib/site";
 import { Header } from "@/components/header";
 import "./globals.css";
 
@@ -46,6 +46,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable}`}>
       <head>
+        {privatePage ? null : <script async src={`https://www.googletagmanager.com/gtag/js?id=${ADS_ID}`} />}
         {privatePage ? null : <script async src={`https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`} />}
         {privatePage ? null : <script id="google-tag" dangerouslySetInnerHTML={{ __html: GTAG_SNIPPET }} />}
       </head>

@@ -1,8 +1,9 @@
-import { GTM_ID } from "@/lib/site";
+import { ADS_ID, GTM_ID } from "@/lib/site";
 
 export const GTAG_SNIPPET = `window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());`;
+gtag('js', new Date());
+gtag('config', '${ADS_ID}');`;
 
 export function GoogleTagNoscript() {
   return (

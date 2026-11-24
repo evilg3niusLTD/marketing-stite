@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal-page";
-import { CONTACT_EMAIL, GTM_ID } from "@/lib/site";
+import { ADS_ID, CONTACT_EMAIL, GTM_ID } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Privacy policy",
@@ -39,7 +39,7 @@ export default function PrivacyPage() {
 
       <h2>Google Ads</h2>
       <p>
-        Every page loads Google Tag Manager, container {GTM_ID}, so Google Ads can measure visits that come from ads. After a request is saved, we send Google a conversion for that submit and the work email address, so the ad can be matched to the enquiry. Telegram, role, countries, and lead volume are not sent to Google. The tag can set a cookie and send Google the page address, the time, and browser details, including the IP address. Google describes that at{" "}
+        Every page loads Google Tag Manager, container {GTM_ID}, and the Google Ads tag {ADS_ID}, so Google Ads can measure visits that come from ads. After a request is saved, we send Google a conversion for that submit and the work email address, so the ad can be matched to the enquiry. Telegram, role, countries, and lead volume are not sent to Google. The tag can set a cookie and send Google the page address, the time, and browser details, including the IP address. Google describes that at{" "}
         <a href="https://policies.google.com/privacy">policies.google.com/privacy</a>. Lead records on a desk are not sent through this tag.
       </p>
 
