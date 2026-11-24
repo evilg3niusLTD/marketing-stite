@@ -3,6 +3,7 @@ import { ADS_ID, GTM_ID } from "@/lib/site";
 export const GTAG_SNIPPET = `window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
+gtag('config', '${GTM_ID}');
 gtag('config', '${ADS_ID}');`;
 
 export function GoogleTagNoscript() {

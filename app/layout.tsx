@@ -46,8 +46,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable}`}>
       <head>
+        {privatePage ? null : <script async src={`https://www.googletagmanager.com/gtag/js?id=${GTM_ID}`} />}
         {privatePage ? null : <script async src={`https://www.googletagmanager.com/gtag/js?id=${ADS_ID}`} />}
-        {privatePage ? null : <script async src={`https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`} />}
         {privatePage ? null : <script id="google-tag" dangerouslySetInnerHTML={{ __html: GTAG_SNIPPET }} />}
       </head>
       <body className={sans.className}>
