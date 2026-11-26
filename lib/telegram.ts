@@ -1,13 +1,20 @@
 export type TelegramResult = "sent" | "skipped" | "failed";
 
+export function telegramChatId(kind: "alerts" | "live" = "alerts") {
+  if (kind === "live") return process.env.TELEGRAM_LIVE_CHAT_ID || process.env.TELEGRAM_CHAT_ID || "";
+  return process.env.TELEGRAM_CHAT_ID || "";
+}
+
 export async function sendTelegram(text: string): Promise<TelegramResult> {
   const sent = await deliverTelegram(text);
   return sent.ok ? "sent" : sent.reason;
 }
 
-export async function deliverTelegram(text: string): Promise<{ ok: true; messageId: number } | { ok: false; reason: Exclude<TelegramResult, "sent"> }> {
+export async function deliverTelegram(
+  text: string,
+  chatId = telegramChatId("alerts"),
+): Promise<{ ok: true; messageId: number } | { ok: false; reason: Exclude<TelegramResult, "sent"> }> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
   if (!token || !chatId) return { ok: false, reason: "skipped" };
   try {
     const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {

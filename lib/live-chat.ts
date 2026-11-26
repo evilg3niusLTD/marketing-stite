@@ -5,8 +5,8 @@ import path from "path";
 type Sent = { ok: true; messageId: number } | { ok: false };
 
 async function defaultSend(text: string): Promise<Sent> {
-  const { deliverTelegram } = await import("@/lib/telegram");
-  return deliverTelegram(text);
+  const { deliverTelegram, telegramChatId } = await import("@/lib/telegram");
+  return deliverTelegram(text, telegramChatId("live"));
 }
 
 export type HumanReply = { id: string; content: string };

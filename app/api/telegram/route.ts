@@ -1,5 +1,6 @@
 import { timingSafeEqual } from "crypto";
 import { addHumanReply, readTelegramReply } from "@/lib/live-chat";
+import { telegramChatId } from "@/lib/telegram";
 
 export const runtime = "nodejs";
 
@@ -13,7 +14,7 @@ export async function POST(request: Request) {
   } catch {
     return Response.json({ ok: true });
   }
-  const reply = readTelegramReply(update, process.env.TELEGRAM_CHAT_ID || "");
+  const reply = readTelegramReply(update, telegramChatId("live"));
   if (reply) {
     try {
       await addHumanReply(reply);

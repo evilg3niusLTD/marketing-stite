@@ -25,7 +25,7 @@ export default function PrivacyPage() {
         The request form first saves your email address and role on this server so we can reply. Telegram, countries, and lead volume are saved on the next step when you send them. It does not open your email app. After each step is saved, we send those details to a Telegram chat that TrafficLight controls.
       </p>
       <p>
-        The chat on this site keeps the message you type on this server and sends it to a Telegram chat that TrafficLight controls, so a person can reply in the same chat. It does not send the message to an automated assistant.
+        The chat on this site keeps the message you type on this server and sends it to its own Telegram chat that TrafficLight controls, separate from visit and request alerts, so a person can reply in that chat. It does not send the message to an automated assistant.
       </p>
       <p>
         A visit to the site is recorded once for that browser session: the page, the referring site, the country of the connection, the device, system, and browser, and every ad parameter on the address. That includes the keyword, match type, campaign, ad group, device model, network, placement, location id, and ad click id when Google sends them. A desk request from that visit keeps the same details. The visit and the request are sent to the same Telegram chat. The Telegram message includes the IP address and the country looked up from it. The country lookup uses the DB-IP country database, described at <a href="https://db-ip.com">db-ip.com</a>.
