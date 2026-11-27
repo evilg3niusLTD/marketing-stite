@@ -46,7 +46,7 @@ export function Header() {
             </Link>
           ))}
           <Link className="btn btn-small nav-cta" href="/request" aria-current={pathname === "/request" ? "page" : undefined}>
-            Request a desk
+            Book a demo
           </Link>
         </nav>
       </div>

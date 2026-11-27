@@ -119,7 +119,7 @@ export default function PlatformPage() {
             </article>
           ))}
           <p className="module-end">
-            <Link className="btn" href="/request">Request a desk</Link>
+            <Link className="btn" href="/request">Book a demo</Link>
           </p>
         </div>
       </div>

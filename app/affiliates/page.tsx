@@ -126,7 +126,7 @@ export default function AffiliatesPage() {
             <h2>Bring your own affiliates, or join a desk as one.</h2>
             <p>Say which side you are on and we will answer from the TrafficLight address.</p>
           </div>
-          <Link className="btn btn-light" href="/request">Request a desk</Link>
+          <Link className="btn btn-light" href="/request">Book a demo</Link>
         </div>
       </section>
     </>

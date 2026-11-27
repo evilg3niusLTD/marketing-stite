@@ -20,7 +20,7 @@ export function Footer() {
           <ul>
             <li><Link href="/platform">Platform</Link></li>
             <li><Link href="/affiliates">Affiliates</Link></li>
-            <li><Link href="/request">Request a desk</Link></li>
+            <li><Link href="/request">Book a demo</Link></li>
           </ul>
         </div>
         <div>

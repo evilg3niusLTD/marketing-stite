@@ -79,14 +79,14 @@ export default function HomePage() {
     <>
       <section className="hero wrap">
         <div className="hero-copy">
-          <p className="kicker">Affiliate tracking platform</p>
-          <h1>Affiliate tracking, built as a desk.</h1>
+          <p className="kicker">Lead distribution</p>
+          <h1>Affiliate tracking for affiliates, networks, and brands.</h1>
           <p className="lede">
-            TrafficLight supplies the platform your team operates. It records the click, accepts the lead, sends it to a buyer you choose, and holds a conversion until you credit it.
+            State-of-the-art lead distribution. TrafficLight records the click, accepts the lead, sends it to a buyer you choose, and holds a conversion until you credit it.
           </p>
           <div className="hero-actions">
             <Link className="btn" href="/request">
-              Request a desk
+              Book a demo
             </Link>
             <Link className="btn btn-ghost" href="/platform">
               See the platform
@@ -197,11 +197,11 @@ export default function HomePage() {
         <div className="cta-band">
           <div>
             <p className="kicker">trafficlight.gg</p>
-            <h2>Request a desk for your team.</h2>
+            <h2>Book a demo for your team.</h2>
             <p>Tell us the countries, the volume, and who posts the traffic. We reply by email.</p>
           </div>
           <Link className="btn btn-light" href="/request">
-            Request a desk
+            Book a demo
           </Link>
         </div>
       </section>
