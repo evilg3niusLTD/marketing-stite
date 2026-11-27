@@ -96,7 +96,7 @@ export default function HomePage() {
         <div className="stage">
           <video
             className="hero-video"
-            src="/hero-route.mp4"
+            src="/hero-route.mp4?v=2"
             autoPlay
             muted
             loop
