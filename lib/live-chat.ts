@@ -50,7 +50,7 @@ export function chatAlert(input: { code: string; visitor: string }) {
   return [`Live chat ${input.code}`, `Visitor: ${clip(input.visitor, 500)}`, "Reply to this message to speak in the chat."].join("\n");
 }
 
-export function rememberLiveGroup(update: unknown, alertsChat: string): { id: string; title: string } | null {
+export function rememberLiveGroup(update: unknown, alertsChat: string | readonly string[]): { id: string; title: string } | null {
   const root = update && typeof update === "object" ? (update as Record<string, unknown>) : {};
   const message = root.message && typeof root.message === "object" ? (root.message as Record<string, unknown>) : null;
   const member = root.my_chat_member && typeof root.my_chat_member === "object" ? (root.my_chat_member as Record<string, unknown>) : null;
@@ -59,7 +59,8 @@ export function rememberLiveGroup(update: unknown, alertsChat: string): { id: st
   const chat = source.chat && typeof source.chat === "object" ? (source.chat as Record<string, unknown>) : {};
   const id = String(chat.id || "");
   const type = String(chat.type || "");
-  if (!id || id === String(alertsChat) || (type !== "group" && type !== "supergroup")) return null;
+  const skip = new Set((Array.isArray(alertsChat) ? alertsChat : [alertsChat]).map((item) => String(item)));
+  if (!id || skip.has(id) || (type !== "group" && type !== "supergroup")) return null;
   return { id, title: String(chat.title || "") };
 }
 

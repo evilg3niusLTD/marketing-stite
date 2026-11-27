@@ -15,10 +15,19 @@ export async function POST(request: Request) {
   } catch {
     return Response.json({ ok: true });
   }
-  const noticed = rememberLiveGroup(update, process.env.TELEGRAM_CHAT_ID || "");
-  if (noticed && !process.env.TELEGRAM_LIVE_CHAT_ID) {
+  const alerts = process.env.TELEGRAM_CHAT_ID || "";
+  const live = process.env.TELEGRAM_LIVE_CHAT_ID || "";
+  const leads = process.env.TELEGRAM_LEADS_CHAT_ID || "";
+  const noticed = rememberLiveGroup(update, [alerts, live, leads]);
+  if (noticed && !live) {
     try {
       await writeFile("/opt/trafficlight/data/live-group.json", JSON.stringify({ ...noticed, at: new Date().toISOString() }));
+    } catch {
+      // The group can be read from the next notice if the disk write fails.
+    }
+  } else if (noticed && !leads) {
+    try {
+      await writeFile("/opt/trafficlight/data/leads-group.json", JSON.stringify({ ...noticed, at: new Date().toISOString() }));
     } catch {
       // The group can be read from the next notice if the disk write fails.
     }

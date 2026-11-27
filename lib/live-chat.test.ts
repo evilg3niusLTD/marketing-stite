@@ -20,6 +20,8 @@ test("a new group is remembered separately from the click and lead group", () =>
   const update = { message: { message_id: 3, text: "@bot hi", chat: { id: -1002, type: "supergroup", title: "Site chat" } } };
   assert.deepEqual(rememberLiveGroup(update, "-1001"), { id: "-1002", title: "Site chat" });
   assert.equal(rememberLiveGroup(update, "-1002"), null);
+  assert.equal(rememberLiveGroup(update, ["-1001", "-1002"]), null);
+  assert.deepEqual(rememberLiveGroup({ message: { chat: { id: -1003, type: "group", title: "Leads" } } }, ["-1001", "-1002"]), { id: "-1003", title: "Leads" });
   assert.equal(rememberLiveGroup({ message: { chat: { id: 7, type: "private" } } }, "-1001"), null);
 });
 

@@ -1,7 +1,8 @@
 export type TelegramResult = "sent" | "skipped" | "failed";
 
-export function telegramChatId(kind: "alerts" | "live" = "alerts") {
+export function telegramChatId(kind: "alerts" | "live" | "leads" = "alerts") {
   if (kind === "live") return process.env.TELEGRAM_LIVE_CHAT_ID || process.env.TELEGRAM_CHAT_ID || "";
+  if (kind === "leads") return process.env.TELEGRAM_LEADS_CHAT_ID || process.env.TELEGRAM_CHAT_ID || "";
   return process.env.TELEGRAM_CHAT_ID || "";
 }
 

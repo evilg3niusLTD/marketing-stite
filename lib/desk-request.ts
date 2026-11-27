@@ -4,7 +4,7 @@ import path from "path";
 import { hasAd, leadAlert, type AdDetails } from "@/lib/click";
 import { dataFile } from "@/lib/files";
 import type { DeskStart, RequestVolume } from "@/lib/request";
-import { sendTelegram } from "@/lib/telegram";
+import { deliverTelegram, telegramChatId } from "@/lib/telegram";
 import type { VisitContext } from "@/lib/visitor";
 
 export async function saveDeskRequest(input: {
@@ -29,7 +29,7 @@ export async function saveDeskRequest(input: {
   const file = dataFile("requests.jsonl", process.env.REQUESTS_FILE);
   await mkdir(path.dirname(file), { recursive: true });
   await appendFile(file, `${JSON.stringify(record)}\n`, "utf8");
-  await sendTelegram(leadAlert({ ...input.request, ...input.visit, device: record.device, source: input.source, ad }));
+  await deliverTelegram(leadAlert({ ...input.request, ...input.visit, device: record.device, source: input.source, ad }), telegramChatId("leads"));
   return record;
 }
 
@@ -54,7 +54,7 @@ export async function finishDeskRequest(input: { id: string; telegram: string; c
   if (!found) return null;
   await writeFile(file, `${next.join("\n")}\n`, "utf8");
   const saved = found as { email?: string; role?: string; source?: "form" | "chat"; country?: string; ip?: string; device?: string; system?: string; browser?: string };
-  await sendTelegram(leadAlert({
+  await deliverTelegram(leadAlert({
     email: String(saved.email || ""),
     role: String(saved.role || ""),
     telegram: input.telegram,
@@ -67,6 +67,6 @@ export async function finishDeskRequest(input: { id: string; telegram: string; c
     system: saved.system,
     browser: saved.browser,
     updated: true,
-  }));
+  }), telegramChatId("leads"));
   return found;
 }
