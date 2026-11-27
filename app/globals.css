@@ -269,70 +269,17 @@ h3 {
   z-index: 0;
 }
 
-.slip {
+.hero-video {
   position: relative;
   z-index: 1;
+  display: block;
   width: 100%;
-  background: white;
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  aspect-ratio: 1080 / 1280;
+  object-fit: cover;
+  border: 0;
   border-radius: 22px;
-  padding: 8px 22px 20px;
   box-shadow: 0 30px 70px rgba(12, 18, 34, 0.14);
-}
-
-.slip-top,
-.slip-rows div,
-.lamps li {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: center;
-}
-
-.slip-top {
-  padding-top: 16px;
-  color: var(--muted);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.lamps { list-style: none; padding: 10px 0 2px; }
-
-.lamps li {
-  justify-content: flex-start;
-  gap: 10px;
-  padding: 10px 0;
-  border-top: 1px solid var(--line);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-
-.lamp {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  flex: none;
-}
-
-.lamp-green { background: #12b76a; box-shadow: 0 0 0 4px rgba(18, 183, 106, 0.15); }
-.lamp-amber { background: #f5c451; box-shadow: 0 0 0 4px rgba(245, 196, 81, 0.2); }
-.lamp-red { background: #ff5a4f; box-shadow: 0 0 0 4px rgba(255, 90, 79, 0.16); }
-
-.slip-rows div {
-  padding: 10px 0;
-  border-top: 1px solid var(--line);
-  font-size: 0.95rem;
-}
-
-.slip-rows dt { color: var(--muted); font-weight: 600; }
-.slip-rows dd { margin: 0; font-weight: 700; letter-spacing: -0.02em; }
-
-.slip-foot {
-  margin-top: 12px;
-  color: var(--muted);
-  font-size: 0.92rem;
+  background: transparent;
 }
 
 .chip {

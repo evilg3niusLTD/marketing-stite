@@ -94,27 +94,15 @@ export default function HomePage() {
           </div>
         </div>
         <div className="stage">
-        <aside className="slip" aria-label="Illustrative route, not live traffic">
-          <div className="slip-top">
-            <span>Sample route</span>
-            <span>Illustrative</span>
-          </div>
-          <ol className="lamps">
-            <li><span className="lamp lamp-green" />Click stored</li>
-            <li><span className="lamp lamp-green" />Lead accepted</li>
-            <li><span className="lamp lamp-amber" />First deposit held</li>
-            <li><span className="lamp lamp-red" />Not credited yet</li>
-          </ol>
-          <dl className="slip-rows">
-            <div><dt>Funnel</dt><dd>eu-fx</dd></div>
-            <div><dt>Affiliate</dt><dd>1042</dd></div>
-            <div><dt>Country</dt><dd>GB</dd></div>
-            <div><dt>Model</dt><dd>CPA</dd></div>
-            <div><dt>Week cap</dt><dd>40</dd></div>
-            <div><dt>Buyer</dt><dd>Next eligible</dd></div>
-          </dl>
-          <p className="slip-foot">A first deposit stays uncredited until an operator accepts it. The affiliate sees Call Back during that hold.</p>
-        </aside>
+          <video
+            className="hero-video"
+            src="/hero-route.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+            aria-label="Illustrative route, not live traffic"
+          />
         </div>
       </section>
 
