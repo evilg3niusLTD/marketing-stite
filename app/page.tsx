@@ -80,7 +80,10 @@ export default function HomePage() {
       <section className="hero wrap">
         <div className="hero-copy">
           <p className="kicker">Lead distribution</p>
-          <h1>Affiliate tracking for affiliates, networks, and brands.</h1>
+          <h1>Affiliate tracking software for networks, affiliates, and brands.</h1>
+          <p className="lede">
+            Comparing Irev, Trackbox, or Getlinked? This is the system those searches are for.
+          </p>
           <p className="lede">
             State-of-the-art lead distribution. TrafficLight records the click, accepts the lead, sends it to a buyer you choose, and holds a conversion until you credit it.
           </p>
