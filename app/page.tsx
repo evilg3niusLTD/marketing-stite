@@ -82,7 +82,7 @@ export default function HomePage() {
           <p className="kicker">Lead distribution</p>
           <h1>Affiliate tracking software for networks, affiliates, and brands.</h1>
           <p className="lede">
-            Comparing Irev, Trackbox, or Getlinked? This is the system those searches are for.
+            Comparing Irev, Trackbox, or Getlinked? Try TrafficLight Today.
           </p>
           <p className="lede">
             State-of-the-art lead distribution. TrafficLight records the click, accepts the lead, sends it to a buyer you choose, and holds a conversion until you credit it.
