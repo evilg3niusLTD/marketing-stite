@@ -3,7 +3,7 @@ import { mkdtemp, rm } from "fs/promises";
 import { tmpdir } from "os";
 import path from "path";
 import test from "node:test";
-import { addHumanReply, chatAlert, humanReplies, readTelegramReply, recordChatTurn } from "./live-chat.ts";
+import { addHumanReply, chatAlert, humanReplies, readTelegramReply, recordChatTurn, rememberLiveGroup } from "./live-chat.ts";
 
 test("a live chat alert tells the operator to reply", () => {
   const text = chatAlert({ code: "abc12345", visitor: "How does a deal work?" });
@@ -14,6 +14,13 @@ test("a live chat alert tells the operator to reply", () => {
   assert.doesNotMatch(text, /Country:/);
   assert.doesNotMatch(text, /IP:/);
   assert.doesNotMatch(text, /Assistant:/);
+});
+
+test("a new group is remembered separately from the click and lead group", () => {
+  const update = { message: { message_id: 3, text: "@bot hi", chat: { id: -1002, type: "supergroup", title: "Site chat" } } };
+  assert.deepEqual(rememberLiveGroup(update, "-1001"), { id: "-1002", title: "Site chat" });
+  assert.equal(rememberLiveGroup(update, "-1002"), null);
+  assert.equal(rememberLiveGroup({ message: { chat: { id: 7, type: "private" } } }, "-1001"), null);
 });
 
 test("a telegram reply is kept only from the operator chat", () => {

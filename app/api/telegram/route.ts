@@ -1,5 +1,6 @@
 import { timingSafeEqual } from "crypto";
-import { addHumanReply, readTelegramReply } from "@/lib/live-chat";
+import { writeFile } from "fs/promises";
+import { addHumanReply, readTelegramReply, rememberLiveGroup } from "@/lib/live-chat";
 import { telegramChatId } from "@/lib/telegram";
 
 export const runtime = "nodejs";
@@ -13,6 +14,14 @@ export async function POST(request: Request) {
     update = await request.json();
   } catch {
     return Response.json({ ok: true });
+  }
+  const noticed = rememberLiveGroup(update, process.env.TELEGRAM_CHAT_ID || "");
+  if (noticed && !process.env.TELEGRAM_LIVE_CHAT_ID) {
+    try {
+      await writeFile("/opt/trafficlight/data/live-group.json", JSON.stringify({ ...noticed, at: new Date().toISOString() }));
+    } catch {
+      // The group can be read from the next notice if the disk write fails.
+    }
   }
   const reply = readTelegramReply(update, telegramChatId("live"));
   if (reply) {
